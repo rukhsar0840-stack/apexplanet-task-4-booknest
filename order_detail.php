@@ -1,0 +1,8 @@
+<?php
+require_once "config.php";requireLogin();$id=(int)($_GET["id"]??0);
+$stmt=$conn->prepare("SELECT * FROM orders WHERE id=? AND user_id=?");$stmt->bind_param("ii",$id,$_SESSION["user_id"]);$stmt->execute();$order=$stmt->get_result()->fetch_assoc();$stmt->close();if(!$order)redirect("orders.php");
+$stmt=$conn->prepare("SELECT oi.*,p.title,p.author FROM order_items oi JOIN products p ON p.id=oi.product_id WHERE oi.order_id=?");$stmt->bind_param("i",$id);$stmt->execute();$items=$stmt->get_result()->fetch_all(MYSQLI_ASSOC);$stmt->close();
+$pageTitle="Order #".$id;require "header.php";
+?>
+<div class="container py-5"><div class="section-heading"><span>Order details</span><h1>Order #<?= $id ?></h1></div><div class="card-soft"><div class="d-flex justify-content-between flex-wrap gap-2 mb-4"><span>Status: <strong><?= e($order["status"]) ?></strong></span><span><?= e(date("d M Y",strtotime($order["created_at"]))) ?></span></div><?php foreach($items as $i): ?><div class="cart-item"><div class="mini-cover"><?= e(strtoupper(substr($i["title"],0,1))) ?></div><div class="flex-grow-1"><h5><?= e($i["title"]) ?></h5><p class="small text-secondary mb-0"><?= e($i["author"]) ?> · Qty <?= $i["quantity"] ?></p></div><strong>₹<?= number_format($i["price"]*$i["quantity"],2) ?></strong></div><?php endforeach; ?><hr><div class="d-flex justify-content-between"><strong>Total</strong><strong>₹<?= number_format($order["total_amount"],2) ?></strong></div><p class="small text-secondary mt-3 mb-0">Delivery: <?= e($order["address"]) ?></p></div></div>
+<?php require "footer.php"; ?>

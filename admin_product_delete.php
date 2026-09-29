@@ -1,0 +1,2 @@
+<?php
+require_once "config.php";requireAdmin();$id=(int)($_GET["id"]??0);if($id){$stmt=$conn->prepare("UPDATE products SET is_active=0 WHERE id=?");$stmt->bind_param("i",$id);$stmt->execute();$stmt->close();}redirect("admin.php");?>

@@ -1,0 +1,7 @@
+<?php
+require_once "config.php";requireLogin();
+$stmt=$conn->prepare("SELECT u.*,r.role_name FROM users u JOIN roles r ON u.role_id=r.id WHERE u.id=?");$stmt->bind_param("i",$_SESSION["user_id"]);$stmt->execute();$user=$stmt->get_result()->fetch_assoc();$stmt->close();
+$pageTitle="Profile";require "header.php";
+?>
+<div class="container py-5"><div class="row justify-content-center"><div class="col-lg-8"><div class="profile-card"><div class="avatar"><?= e(strtoupper(substr($user["name"],0,1))) ?></div><h2><?= e($user["name"]) ?></h2><p class="text-secondary"><?= e($user["email"]) ?></p><span class="badge text-bg-primary"><?= e($user["role_name"]) ?></span><hr><div class="row g-3 text-start"><div class="col-md-6"><small class="text-secondary">Phone</small><div><?= e($user["phone"] ?: "Not added") ?></div></div><div class="col-md-6"><small class="text-secondary">Joined</small><div><?= e(date("d M Y",strtotime($user["created_at"]))) ?></div></div><div class="col-12"><small class="text-secondary">Bio</small><div><?= nl2br(e($user["bio"] ?: "No bio added.")) ?></div></div></div><a href="edit_profile.php" class="btn btn-primary mt-4">Edit profile</a></div></div></div></div>
+<?php require "footer.php"; ?>

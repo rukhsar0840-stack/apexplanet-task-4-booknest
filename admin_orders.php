@@ -1,0 +1,8 @@
+<?php
+require_once "config.php";requireAdmin();
+if($_SERVER["REQUEST_METHOD"]==="POST"){$id=(int)$_POST["id"];$status=$_POST["status"]??"Pending";$allowed=["Pending","Processing","Shipped","Delivered","Cancelled"];if(in_array($status,$allowed,true)){$stmt=$conn->prepare("UPDATE orders SET status=? WHERE id=?");$stmt->bind_param("si",$status,$id);$stmt->execute();$stmt->close();}}
+$orders=$conn->query("SELECT o.*,u.name,u.email FROM orders o JOIN users u ON o.user_id=u.id ORDER BY o.id DESC")->fetch_all(MYSQLI_ASSOC);
+$pageTitle="Manage orders";require "header.php";
+?>
+<div class="container py-5"><div class="section-heading"><span>Admin panel</span><h1>Manage orders</h1></div><div class="card-soft"><div class="table-responsive"><table class="table align-middle"><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Update</th></tr></thead><tbody><?php foreach($orders as $o): ?><tr><td>#<?= $o["id"] ?></td><td><?= e($o["name"]) ?><br><small><?= e($o["email"]) ?></small></td><td>₹<?= number_format($o["total_amount"],2) ?></td><td><?= e($o["status"]) ?></td><td><form method="post" class="d-flex gap-1"><input type="hidden" name="id" value="<?= $o["id"] ?>"><select class="form-select form-select-sm" name="status"><?php foreach(["Pending","Processing","Shipped","Delivered","Cancelled"] as $s): ?><option <?= $o["status"]===$s?"selected":"" ?>><?= $s ?></option><?php endforeach; ?></select><button class="btn btn-sm btn-primary">Save</button></form></td></tr><?php endforeach; ?></tbody></table></div></div></div>
+<?php require "footer.php"; ?>

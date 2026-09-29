@@ -1,0 +1,2 @@
+<?php
+require_once "config.php";requireAdmin();$id=(int)($_GET["id"]??0);if($id&&$id!=$_SESSION["user_id"]){$stmt=$conn->prepare("DELETE FROM users WHERE id=?");$stmt->bind_param("i",$id);$stmt->execute();$stmt->close();}redirect("admin.php");?>
